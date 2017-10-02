@@ -61,8 +61,24 @@ public class InPlay extends CardGroup {
 	}
 	
 	public String toString(){
-		return null;
-		
+		String str = ""; 
+		for(Card[] bat : battles){
+			str += bat[0].toString() + " : " + bat[1].toString() + '\n';
+		}
+		return str;
+	}
+
+	public int numBattles() {
+		return battles.size();
+	}
+	
+	public boolean isDefended(){
+		boolean def = false;
+		for(Card[] bat : battles){
+			if (bat[1] == null)
+				return def;
+		}
+		return true;
 	}
 
 }
