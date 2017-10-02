@@ -44,40 +44,23 @@ public class Game {
 		//TODO: find player with lowest hand to start
 		int defender = 0;
 		int attacker;
-		int selection = -1;
+		int selection = -2;
 		
+	
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-		
+
 		
 		while(!isFinished){
 			//main game loop
 			attacker = (defender - 1) % (playersHuman.size() - 1);
-			System.out.println(playersHuman.get(attacker).toString());
-			System.out.println("Please select a card to attack with.");
-			try {
-				selection = Integer.parseInt(br.readLine());
-			} catch (NumberFormatException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			} catch (IOException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}
 			
+			System.out.println("Attacker " + attacker + ".");
+			selection = getSelection(attacker);
 			inPlay.attack(playersHuman.get(attacker).remove(selection));
 			
-			playersHuman.get(defender).toString();
-
-			System.out.println("Please select a card to defend with or type -1 to give up.");
-			try {
-				selection = Integer.parseInt(br.readLine());
-			} catch (NumberFormatException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+			System.out.println("Defender:");
+			selection = getSelection(defender);
+			
 			if (selection == -1){
 				playersHuman.get(defender).add(inPlay.fold());
 				continue;
@@ -97,15 +80,41 @@ public class Game {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-				if ((selection != defender) && (selection < playersHuman.size()))
+				if ((selection != defender) && (selection < playersHuman.size())){
+					attacker = selection;
 					break;
-				else
+				}else
 					System.out.println("try again...");
 				
 			}
 		}
 		
 	}
-
+	
+	public int getSelection(int player){
+		int selection = -2;
+		
+		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+		playersHuman.get(player).toString();
+	
+		System.out.println("Please select a card to play with or type -1 to give up.");
+		while(true){
+			try {
+				selection = Integer.parseInt(br.readLine());
+			} catch (NumberFormatException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			if (-1 <= selection && selection < playersHuman.get(player).getCards().size()){
+				return selection;
+			}
+			else
+				System.out.println("Try another selection");
+		}
+		
+	}
 
 }
