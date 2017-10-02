@@ -80,5 +80,11 @@ public class InPlay extends CardGroup {
 		}
 		return true;
 	}
+	public boolean isDefended(int i){
+		if (battles.get(i)[1] == null)
+			return false;
+		else return true;
+
+	}
 
 }

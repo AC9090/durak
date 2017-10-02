@@ -17,12 +17,14 @@ public class Game {
 	InPlay inPlay;
 	Suit trump;
 	public static void main(String[] args) {
+		//method that starts program
 		Game game  = new Game(2,0);
 		game.run();
 	}
 	
 
 	public Game(int numPlayersHuman, int numPlayersCpu){
+		//constructs relevant objects
 		deck = new Deck();
 		deck.buildDeck();
 		trump = deck.pickTrump();
@@ -34,6 +36,7 @@ public class Game {
 	}
 	
 	private void run() {
+		//deal the cards to the players
 		for (int i = 0; i <  2/*6 TODO:*/; i++){
 			for (Hand player : playersHuman){
 				player.add(deck.pickUp());
@@ -46,90 +49,116 @@ public class Game {
 		int attacker;
 		int selection = -2;
 		
+		//for chuvaks that have no cards left
+		ArrayList<Hand> notDurak = new ArrayList<Hand>();
 	
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-
 		
+		//each round is contained in this loop until only one remains
+		round:
 		while(!isFinished){
 			//main game loop
-				attacker = (defender - 1) % (playersHuman.size() - 1);
-				
-				System.out.println("Attacker " + attacker + ".");
-				selection = getCardChoice(attacker);
-				inPlay.attack(playersHuman.get(attacker).remove(selection));
-				
-				System.out.println("Defender:");
-				selection = getCardChoice(defender);
-				
-				if (selection == -1){
-					playersHuman.get(defender).add(inPlay.fold());
-					continue;
-				} else {
-					inPlay.defend(playersHuman.get(defender).remove(selection), 0);
-				}
-				
+			attacker = (defender - 1) % (playersHuman.size() - 1);
+			
+			System.out.println("Attacker " + attacker + ".");
+			selection = getCardChoice(attacker);
+			inPlay.attack(playersHuman.get(attacker).remove(selection));
+			
+			System.out.println("Defender:");
+			selection = getCardChoice(defender);
+			
+			if (selection == -1){
+				playersHuman.get(defender).add(inPlay.fold());
+				continue;
+			} else {
+				inPlay.defend(playersHuman.get(defender).remove(selection), 0);
+			}
+			
+			while (true) {
 				while (true) {
+					//all attackers that want to can now place their cards. (no support for single attacker yet)
+					System.out
+							.println("Please select an attacker from 0 to "
+									+ (playersHuman.size() - 1)
+									+ " that is not defender " + defender
+									+ ".");
+					//select a player
 					while (true) {
+
+						selection = getSelection();
+						if ((selection != defender && ! notDurak.contains(playersHuman.get(selection)))
+								&& (selection < playersHuman.size())) {
+							attacker = selection;
+							break;
+						} else
+							System.out.println("try again...");
+
+					}
+					//select a card to attack with
+					System.out.println("Attacker " + attacker + ":");
+					playersHuman.get(attacker).toString();
+					selection = getCardChoice(attacker);
+					inPlay.attack(playersHuman.get(attacker).remove(
+							selection)); //TODO: Handle invalid choice
+					
+					//max number of cards placed?
+					if (inPlay.numBattles() < 6) {
 						System.out
-								.println("Please select an attacker from 0 to "
-										+ (playersHuman.size() - 1)
-										+ " that is not defender " + defender
-										+ ".");
-						while (true) {
-
-							selection = getSelection();
-							if ((selection != defender)
-									&& (selection < playersHuman.size())) {
-								attacker = selection;
-								break;
-							} else
-								System.out.println("try again...");
-
-						}
-						System.out.println("Attacker " + attacker + ":");
-						playersHuman.get(attacker).toString();
-						selection = getCardChoice(attacker);
-						inPlay.attack(playersHuman.get(attacker).remove(
-								selection));
-
-						if (inPlay.numBattles() < 6) {
-							System.out
-									.println("Attack Again (1 for yes 0 for no)?");
-							selection = getSelection();
-							if (selection == 0) {
-								break;
-							}
+								.println("Attack Again (1 for yes 0 for no)?");
+						selection = getSelection();
+						if (selection == 0) {
+							break;
 						}
 					}
-					while (true) {
-						System.out.println("Defender:");
-						System.out.println("Choose card to defend against:");
-						inPlay.toString();
-						
+				notDurak.addAll(notDurak());
+				}
+				System.out.println("Defender:");
+				while (true) {
+					//the defender must now defend
+					System.out.println("Choose card to defend against:");
+					inPlay.toString();
+					
+					int selectionDef = getSelection();
+					
+					//player folds
+					if (selection == -1) {
+						playersHuman.get(defender).add(inPlay.fold());
+						System.out.println("Defender is beaten");
+						break round;
+					//chosen a card to defend against
+					} else if (selection < playersHuman.get(defender).getCards().size()){
 						selection = getCardChoice(defender);
-
-						if (selection == -1) {
-							playersHuman.get(defender).add(inPlay.fold());
-							continue;
-						} else {
-							inPlay.defend(
-									playersHuman.get(defender)
-											.remove(selection), 0);
-						}
-						if (!inPlay.isDefended()) {
-							System.out
-									.println("Defend again (1 for yes 0 for no)?");
-							selection = getSelection();
-							if (selection == 0)
-								break;
-						}
+						inPlay.defend(playersHuman.get(defender).remove(selection), selectionDef); //TODO: Handle invalid cards
+					} else {
+						System.out.println("Card is invalid, try again.");
+						continue;
 					}
-					if(inPlay.isDefended() && inPlay.numBattles() == 6){
-						System.out.println("Succesfully defended!");
+					notDurak.addAll(notDurak());
+					if(notDurak.contains(playersHuman.get(defender))){
+						defender += 1;
+						while (notDurak.contains(playersHuman.get(defender))) {
+							defender += 1;
+							defender %= playersHuman.size() - 1;
+						}
+						break round;
+					}
+					if (!inPlay.isDefended()) {
+						System.out
+								.println("Defended current attack.");
+						break;
+						
+					}
+				}
+				if(inPlay.isDefended() && inPlay.numBattles() == 6){
+					System.out.println("Succesfully defended!");
+					while (notDurak.contains(playersHuman.get(defender))) {
 						defender += 1;
 						defender %= playersHuman.size() - 1;
 					}
+					break round;
 				}
+
+			}
 				
 			
 		}
@@ -168,6 +197,16 @@ public class Game {
 			e.printStackTrace();
 		}
 		return -2;
+	}
+	private ArrayList<Hand> notDurak(){
+		ArrayList<Hand> nd = new ArrayList<Hand>();
+		for(Hand player: playersHuman){
+			if(player.getCards().size() == 0)
+				nd.add(player);
+				System.out.println("Player " + playersHuman.indexOf(player) + "is out!");
+				
+		}
+		return nd;
 	}
 
 }
