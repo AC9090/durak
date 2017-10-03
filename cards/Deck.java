@@ -31,14 +31,12 @@ public class Deck extends CardGroup {
 	}
 	
 	public ArrayList<Card> buildDeck(){
-		cards.add(new Card(1, Suit.CLUBS));
-		cards.add(new Card(12, Suit.CLUBS));
-		cards.add(new Card(2, Suit.SPADES));
-		cards.add(new Card(4, Suit.SPADES));
-		cards.add(new Card(3, Suit.HEARTS));
-		cards.add(new Card(5, Suit.SPADES));
-		cards.add(new Card(3, Suit.CLUBS));
-		//shuffle();
+		for(int i = 1; i <= 12; i++){
+			for(Suit s : Suit.values()){
+				cards.add(new Card(i, s));
+			}
+		}
+		shuffle();
 		return cards;
 	}
 	

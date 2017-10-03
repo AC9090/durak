@@ -37,7 +37,7 @@ public class Game {
 	
 	private void run() {
 		//deal the cards to the players
-		for (int i = 0; i <  2/*6 TODO:*/; i++){
+		for (int i = 0; i < 6; i++){
 			for (Hand player : playersHuman){
 				player.add(deck.pickUp());
 			}
@@ -57,14 +57,20 @@ public class Game {
 		//each round is contained in this loop until only one remains
 		round:
 		while(!isFinished){
+			for (Hand player : playersHuman){ //TODO: order so winner picks first
+				while(player.getCards().size() < 7)
+					player.add(deck.pickUp());
+			}
 			//main game loop
 			attacker = (defender - 1) % (playersHuman.size() - 1);
 			
-			System.out.println("Attacker " + attacker + ".");
+			System.out.println("Attacker " + attacker + ":");
+			System.out.println(playersHuman.get(attacker).toString());
 			selection = getCardChoice(attacker);
 			inPlay.attack(playersHuman.get(attacker).remove(selection));
 			
 			System.out.println("Defender:");
+			System.out.println(playersHuman.get(defender).toString());
 			selection = getCardChoice(defender);
 			
 			if (selection == -1){
@@ -96,7 +102,7 @@ public class Game {
 					}
 					//select a card to attack with
 					System.out.println("Attacker " + attacker + ":");
-					playersHuman.get(attacker).toString();
+					System.out.println(playersHuman.get(attacker).toString());
 					selection = getCardChoice(attacker);
 					inPlay.attack(playersHuman.get(attacker).remove(
 							selection)); //TODO: Handle invalid choice
@@ -123,7 +129,7 @@ public class Game {
 					//player folds
 					if (selection == -1) {
 						playersHuman.get(defender).add(inPlay.fold());
-						System.out.println("Defender is beaten");
+						System.out.println("Defender is beaten.");
 						break round;
 					//chosen a card to defend against
 					} else if (selection < playersHuman.get(defender).getCards().size()){
@@ -190,11 +196,9 @@ public class Game {
 			selection = Integer.parseInt(br.readLine());
 			return selection;
 		} catch (NumberFormatException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			System.out.println(e.getMessage() + " could not find number");
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			System.out.println(e.getMessage());
 		}
 		return -2;
 	}
