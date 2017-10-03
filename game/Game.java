@@ -62,7 +62,11 @@ public class Game {
 					player.add(deck.pickUp());
 			}
 			//main game loop
-			attacker = (defender - 1) % (playersHuman.size() - 1);
+			attacker = (defender - 1) % (playersHuman.size());
+			if (attacker < 0)
+			{
+			    attacker += playersHuman.size();
+			}
 			
 			System.out.println("Attacker " + attacker + ":");
 			System.out.println(playersHuman.get(attacker).toString());
@@ -77,7 +81,7 @@ public class Game {
 				playersHuman.get(defender).add(inPlay.fold());
 				continue;
 			} else {
-				inPlay.defend(playersHuman.get(defender).remove(selection), 0);
+				inPlay.defend(playersHuman.get(defender).remove(selection), 0); //TODO: Handle invalid cards
 			}
 			
 			while (true) {
@@ -122,7 +126,7 @@ public class Game {
 				while (true) {
 					//the defender must now defend
 					System.out.println("Choose card to defend against:");
-					inPlay.toString();
+					System.out.print(inPlay.toString());
 					
 					int selectionDef = getSelection();
 					
@@ -144,7 +148,7 @@ public class Game {
 						defender += 1;
 						while (notDurak.contains(playersHuman.get(defender))) {
 							defender += 1;
-							defender %= playersHuman.size() - 1;
+							defender %= playersHuman.size();
 						}
 						break round;
 					}
@@ -159,7 +163,7 @@ public class Game {
 					System.out.println("Succesfully defended!");
 					while (notDurak.contains(playersHuman.get(defender))) {
 						defender += 1;
-						defender %= playersHuman.size() - 1;
+						defender %= playersHuman.size();
 					}
 					break round;
 				}
