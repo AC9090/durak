@@ -22,12 +22,12 @@ public class Deck extends CardGroup {
 		return s;
 	}
 	
-	public Card pickUp(){
-		if (cards.size() >= 0) {			
-			return cards.remove(0);
-		} else {
-			return null;
-		}
+	public ArrayList<Card> pickUp(int i){
+		ArrayList<Card> c = new ArrayList<Card>();
+		while (!cards.isEmpty() && c.size() < i){
+			c.add(cards.remove(0));
+		} 
+		return c;
 	}
 	
 	public ArrayList<Card> buildDeck(){
@@ -42,5 +42,11 @@ public class Deck extends CardGroup {
 	
 	public void shuffle(){
 		Collections.shuffle(cards);
+	}
+
+	public Card pickUp() {
+		if (!cards.isEmpty())
+			return cards.remove(0);
+		return null;
 	}
 }

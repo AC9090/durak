@@ -1,5 +1,7 @@
 package cards;
 
+import game.InvalidMove;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 
@@ -7,7 +9,6 @@ import java.util.Iterator;
 
 public class InPlay extends CardGroup {
 	
-	//make these into iterator
 	private ArrayList<Card[]> battles = new ArrayList<Card[]>();
 	Suit trump;
 	public InPlay(Suit trump) {
@@ -15,7 +16,7 @@ public class InPlay extends CardGroup {
 		this.trump = trump;
 	}
 	
-	public ArrayList<Card> fold(){
+	public ArrayList<Card> fold(){ //all cards are returned from play
 		ArrayList<Card> c = new ArrayList<Card>();
 		Iterator<Card[]> bat = battles.iterator();
 		while (bat.hasNext()){
@@ -26,7 +27,7 @@ public class InPlay extends CardGroup {
 		return c;
 	}
 	
-	public int attack(Card c){
+	public void attack(Card c) throws InvalidMove{ //places a card in the attack column checking it is allowed
 		boolean valid = false;
 		
 		Iterator<Card[]> cards = battles.iterator();
@@ -43,20 +44,20 @@ public class InPlay extends CardGroup {
 		if (valid){
 			battles.add(new Card[2]);
 			battles.get(battles.size() - 1)[0] = c;
-			return 0;
+			return;
 		} else {
-			return 1;
+			throw new InvalidMove();
 		}
 	}
 	
-	public int defend(Card c, int index){
+	public void defend(Card c, int index) throws InvalidMove{
 		
 		if ((battles.get(index)[0].getSuit().equals(c.getSuit()) && battles.get(index)[0].getValue() < c.getValue())
 				||( ! battles.get(index)[0].getSuit().equals(trump)) && c.getSuit().equals(trump)){
 			battles.get(index)[1] = c;
-			return 0;
+			return;
 		} else {
-			return 1;
+			throw new InvalidMove();
 		}
 	}
 	
