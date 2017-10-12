@@ -79,7 +79,7 @@ public abstract class GameObject {
 	}
 	
 	private float[] genVertexArray(){
-		
+		System.out.println(sx + ", " + sy );
 		return new float[] {
 				x, y,
 				x, y + sy,

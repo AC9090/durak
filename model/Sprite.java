@@ -8,6 +8,8 @@ import java.nio.FloatBuffer;
 
 import org.lwjgl.BufferUtils;
 
+import engine.Texture;
+
 public class Sprite {
 	private final int x, y;
 	private final int SIZEX, SIZEY;
@@ -18,6 +20,8 @@ public class Sprite {
 		0.5f,0.6f,0.6f,1.0f,
 		0.5f,0.6f,0.6f,1.0f};
 	
+	private float[] texVert;
+	
 	private final int vaoId;
 	private int vboIdTex;
 	private int vboIdCol;
@@ -27,6 +31,9 @@ public class Sprite {
 		this.SIZEX = sx;
 		this.SIZEY = sy;
 		this.tex = tex;
+		
+		texVert = genVertexArray();
+		
 		this.vaoId = vaoId;
 		glBindVertexArray(vaoId);
 		vboIdCol = glGenBuffers();
@@ -43,7 +50,7 @@ public class Sprite {
 		glEnableVertexAttribArray(1);
 		glVertexAttribPointer(1, 4, GL_FLOAT, false, 0, 0);
 		
-		FloatBuffer vertexBuffer = BufferUtils.createFloatBuffer(8).put(genVertexArray());
+		FloatBuffer vertexBuffer = BufferUtils.createFloatBuffer(8).put(texVert);
 		vertexBuffer.flip();
 		glBindBuffer(GL_ARRAY_BUFFER, vboIdTex);
 		glBufferData(GL_ARRAY_BUFFER, vertexBuffer, GL_STATIC_DRAW);
@@ -61,7 +68,6 @@ public class Sprite {
 		float f_y = ((float) y) / ((float) tex.getSIZEY());
 		float f_sx = ((float) SIZEX) / ((float) tex.getSIZEY());
 		float f_sy = ((float) SIZEY) / ((float) tex.getSIZEY());
-		System.out.println(f_x + " " + f_sy);
 		return new float[] {
 				f_x, f_y + f_sy,
 				f_x, f_y,

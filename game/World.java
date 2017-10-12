@@ -6,7 +6,6 @@ import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL15.*;
 import static org.lwjgl.opengl.GL20.*;
 import static org.lwjgl.opengl.GL30.*;
-import model.Texture;
 import model.ViewCard;
 
 import org.lwjgl.BufferUtils;
@@ -21,6 +20,7 @@ import org.lwjgl.opengl.PixelFormat;
 import cards.Suit;
 
 import engine.ResourceLoader;
+import engine.Texture;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -35,6 +35,7 @@ public class World {
 	
 	private long lastFrame;
 	private static final int WD = 800, HT = 600;
+	private static final float aspect = (float)WD / (float) HT;
 	private ViewCard viewCard;
 	private ViewCard viewCard2;
 	private boolean exit = false;
@@ -50,10 +51,7 @@ public class World {
 		game = new Game(numPlayers);
 		initDisplay();
 		initGl();
-//		initModels();
-		Texture tex = ResourceLoader.loadTexture("cards.png", GL_TEXTURE0);
-		viewCard = new ViewCard(-1f, -1f, 1f, 1f, Suit.CLUBS, 13, tex);
-		viewCard2 = new ViewCard(-0.75f, -0.75f, 1.25f, 1.25f, Suit.HEARTS, 8, tex);
+		initModels();
 	}
 	
 
@@ -90,9 +88,8 @@ public class World {
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		glLoadIdentity();
 		glClearColor(0.1f,0.1f,0.1f, 1.0f);
+
 		glUseProgram(pId);
-//		glColor3f(0.1f, 0.5f, 0.5f);
-//		glRectf(0, 0, WD, HT);
 		glColor3f(1.0f, 0.5f, 0.5f);
 	    
 		viewCard.render();
@@ -102,7 +99,15 @@ public class World {
 	}
 
 	private void initModels() {
-	
+		Texture tex = ResourceLoader.loadTexture("cards.png", GL_TEXTURE0);
+		float cwth =  (326f/4f)/(800f/13f);
+		float csx = 0.2f;
+		float csy = csx * cwth * aspect;
+		System.out.println(cwth);
+		viewCard = new ViewCard(-0f, -0f, csx, csy, Suit.CLUBS, 13, tex);
+		viewCard2 = new ViewCard(-0.75f, -0.75f, csx, csy, Suit.HEARTS, 8, tex);
+		viewCard2.flip();
+		
 		switch (numPlayers){
 		case 2:
 			
