@@ -87,5 +87,9 @@ public class InPlay extends CardGroup {
 		else return true;
 
 	}
+	
+	public ArrayList<Card[]> getCardPairs(){
+		return battles;
+	}
 
 }

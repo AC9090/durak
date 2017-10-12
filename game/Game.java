@@ -54,11 +54,7 @@ public class Game {
 		}
 		attacker = playersHuman.get(attNum);
 		//deal the cards to the players
-		for (int i = 0; i < 6; i++){ 
-			for (Hand player : playersHuman){
-				player.add(deck.pickUp());
-			}
-		}
+
 	}
 	
 	public void play(Hand h, Card c, int selection) throws InvalidMove, InvalidPlayer{
@@ -168,6 +164,14 @@ public class Game {
 		    attNum += playersHuman.size();
 		}
 		attacker = playersHuman.get(attNum);
+	}
+	
+	public void deal(){
+		for (int i = 0; i < 6; i++){ 
+			for (Hand player : playersHuman){
+				player.add(deck.pickUp());
+			}
+		}
 	}
 
 /*
@@ -333,6 +337,21 @@ public class Game {
 				
 		}
 		return nd;
+	}
+
+	public ArrayList<Card> getDeckCards() {
+		return deck.getCards();
+	}
+	
+	public ArrayList<Card[]> getInPlayCards(){
+		return inPlay.getCardPairs();
+	}
+	
+	public ArrayList<Hand> getHands(){
+		return playersHuman;
+	}
+	public Discard getDiscard(){
+		return discard;
 	}
 
 }

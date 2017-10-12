@@ -36,6 +36,15 @@ public class ViewCard extends GameObject {
 		faceDown =  !faceDown;
 		spr = faceDown ? backSpr : faceSpr;
 	}
+	
+	public void setFaceDown(){
+		faceDown = true;
+		spr = backSpr;
+	}
+	public void setFaceUp(){
+		faceDown = false;
+		spr = faceSpr;
+	}
 
 	public boolean isFaceDown() {
 		return faceDown;

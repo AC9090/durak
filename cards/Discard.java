@@ -8,5 +8,9 @@ public class Discard extends CardGroup {
 		super();
 		// TODO Auto-generated constructor stub
 	}
+	
+	public boolean isEmpty(){
+		return (cards.size() == 0 );
+	}
 
 }

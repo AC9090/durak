@@ -6,7 +6,6 @@ import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL15.*;
 import static org.lwjgl.opengl.GL20.*;
 import static org.lwjgl.opengl.GL30.*;
-import model.ViewCard;
 
 import org.lwjgl.BufferUtils;
 import org.lwjgl.LWJGLException;
@@ -17,7 +16,11 @@ import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.DisplayMode;
 import org.lwjgl.opengl.PixelFormat;
 
+import cards.Hand;
 import cards.Suit;
+import cards.Card;
+
+import model.ViewCard;
 
 import engine.ResourceLoader;
 import engine.Texture;
@@ -28,6 +31,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
+import java.util.ArrayList;
+import java.util.HashMap;
 
 public class World {
 
@@ -44,6 +49,8 @@ public class World {
 	private int vsId;
 	private int fsId;
 	private int pId;
+	
+	HashMap<Card, ViewCard> cards;
 
 	
 	public World(int numPlayers){
@@ -66,7 +73,8 @@ public class World {
 		while (!Display.isCloseRequested() && !exit ){
 			getInput();
 			
-			//update;
+			update();
+			
 			render();
 			
 			Display.update();
@@ -78,11 +86,63 @@ public class World {
 		
 	}
 	
+
 	private void getInput() {
 		
 		
 	}
 
+	private void update() {
+		//top of deck
+		{
+			ViewCard c = cards.get(game.getDeckCards().get(0));
+			c.setPos(-1f, 1f - c.getSY());
+			c.setFaceDown();
+			c.setVisible(true);
+		}
+		//cards on board
+		{
+		ArrayList<Card[]> ipc = game.getInPlayCards();
+		for(int i = 0; i < ipc.size(); i ++){
+			Card[] cp = ipc.get(i);
+		
+			if(cp[0] != null){
+				ViewCard c = cards.get(cp[0]);
+				c.setPos(-0.25f +  i* c.getSX(), 0 - c.getSY());
+				c.setFaceUp();
+				c.setVisible(true);
+			}
+			if(cp[1] != null){
+				ViewCard c = cards.get(cp[1]);
+				c.setPos(-0.25f +  i* c.getSX(), 0);
+				c.setFaceUp();
+				c.setVisible(true);
+			}
+		}
+		}
+		// cards in hands
+		
+		ArrayList<Hand> hands = game.getHands();
+		for (int i = 0; i < hands.size(); i++){
+			ArrayList<Card> ch = hands.get(i).getCards();
+			for(int j = 0; j < ch.size(); j++){
+				ViewCard c = cards.get(ch.get(j));
+				c.setPos(-1f + j*c.getSX(), -1f + i*c.getSY());
+				c.setFaceUp();
+				c.setVisible(true);
+			}
+		}
+		
+		if (!game.getDiscard().isEmpty()){
+			ViewCard c = cards.get(game.getDiscard().getCards().get(game.getDiscard().getCards().size() - 1));
+			c.setPos(1.0f - c.getSX(), 1.0f - c.getSY());
+			c.setFaceDown();
+			c.setVisible(true);
+		}
+			
+				
+	}
+	
 
 	private void render(){
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -92,8 +152,12 @@ public class World {
 		glUseProgram(pId);
 		glColor3f(1.0f, 0.5f, 0.5f);
 	    
-		viewCard.render();
-		viewCard2.render();
+		for (ViewCard c : cards.values()){
+			c.render();
+		}
+		
+//		viewCard.render();
+//		viewCard2.render();
 		//draw
 		this.exitOnGLError("render");
 	}
@@ -106,8 +170,13 @@ public class World {
 		System.out.println(cwth);
 		viewCard = new ViewCard(-0f, -0f, csx, csy, Suit.CLUBS, 13, tex);
 		viewCard2 = new ViewCard(-0.75f, -0.75f, csx, csy, Suit.HEARTS, 8, tex);
-		viewCard2.flip();
-		
+		//viewCard2.flip();
+		cards = new HashMap<Card, ViewCard>();
+		for(Card c : game.getDeckCards()){
+			cards.put(c, new ViewCard(0,0,csx,csy,c.getSuit(), c.getValue(),tex));
+//			cards.get(c).setVisible(false);
+		}
+		game.deal();
 		switch (numPlayers){
 		case 2:
 			

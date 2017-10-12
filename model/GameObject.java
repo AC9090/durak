@@ -21,7 +21,7 @@ public abstract class GameObject {
 	protected int vboIdInd;
 	protected float x;
 	protected float y;
-	
+	protected boolean visible = true;
 	protected float sx, sy;
 	
 	protected Sprite spr;
@@ -32,33 +32,32 @@ public abstract class GameObject {
 	}
 	
 	public void render(){
-		glBindVertexArray(vaoId);
-
-		FloatBuffer vertexBuffer = BufferUtils.createFloatBuffer(8).put(genVertexArray());
-		vertexBuffer.flip();
 		
-		glBindBuffer(GL_ARRAY_BUFFER, vboIdVert);
-		glBufferData(GL_ARRAY_BUFFER, vertexBuffer, GL_STATIC_DRAW);
-		glEnableVertexAttribArray(0);
-		glVertexAttribPointer(0, 2, GL_FLOAT,false, 0, 0);
-		
-		spr.render();
-		
-		ByteBuffer indexBuffer = BufferUtils.createByteBuffer(6).put(new byte[] {0,1,2,0,2,3});
-		indexBuffer.flip();
-		glBindVertexArray(0);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vboIdInd);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, indexBuffer, GL_STATIC_DRAW);
-		glBindVertexArray(vaoId);
-		glEnableVertexAttribArray(0);
-		glEnableVertexAttribArray(1);
-		glEnableVertexAttribArray(2);
-		
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vboIdInd);
-		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_BYTE, 0);
-//		glDrawArrays(GL_QUADS, 0, 1);
-		
-		glBindVertexArray(0);
+		if (visible) {
+			glBindVertexArray(vaoId);
+			FloatBuffer vertexBuffer = BufferUtils.createFloatBuffer(8).put(
+					genVertexArray());
+			vertexBuffer.flip();
+			glBindBuffer(GL_ARRAY_BUFFER, vboIdVert);
+			glBufferData(GL_ARRAY_BUFFER, vertexBuffer, GL_STATIC_DRAW);
+			glEnableVertexAttribArray(0);
+			glVertexAttribPointer(0, 2, GL_FLOAT, false, 0, 0);
+			spr.render();
+			ByteBuffer indexBuffer = BufferUtils.createByteBuffer(6).put(
+					new byte[] { 0, 1, 2, 0, 2, 3 });
+			indexBuffer.flip();
+			glBindVertexArray(0);
+			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vboIdInd);
+			glBufferData(GL_ELEMENT_ARRAY_BUFFER, indexBuffer, GL_STATIC_DRAW);
+			glBindVertexArray(vaoId);
+			glEnableVertexAttribArray(0);
+			glEnableVertexAttribArray(1);
+			glEnableVertexAttribArray(2);
+			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vboIdInd);
+			glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_BYTE, 0);
+			//		glDrawArrays(GL_QUADS, 0, 1);
+			glBindVertexArray(0);
+		}
 
 	}
 
@@ -73,8 +72,28 @@ public abstract class GameObject {
 	public float getY() {
 		return y;
 	}
-
+	
 	public void setY(float y) {
+		this.y = y;
+	}
+	
+	public float getSX(){
+		return sx;
+	}
+	public float getSY(){
+		return sy;
+	}
+	
+	public boolean isVisible() {
+		return visible;
+	}
+	
+	public void setVisible(boolean b) {
+		visible = b;
+	}
+	
+	public void setPos(float x, float y){
+		this.x = x;
 		this.y = y;
 	}
 	
