@@ -15,10 +15,10 @@ public class Sprite {
 	private final int SIZEX, SIZEY;
 	private Texture tex;
 	private float[] colors = {
-		0.5f,0.6f,0.6f,1.0f,
-		0.5f,0.6f,0.6f,1.0f,
-		0.5f,0.6f,0.6f,1.0f,
-		0.5f,0.6f,0.6f,1.0f};
+		1.0f,1.0f,1.0f,1.0f,
+		1.0f,1.0f,1.0f,1.0f,
+		1.0f,1.0f,1.0f,1.0f,
+		1.0f,1.0f,1.0f,1.0f};
 	
 	private float[] texVert;
 	
@@ -74,6 +74,12 @@ public class Sprite {
 				f_x + f_sx, f_y,
 				f_x + f_sx, f_y + f_sy,
 		};
+	}
+	
+	public void setColors(float[] a){
+		if (a.length != 16) return;
+		
+		colors = a;
 	}
 
 }

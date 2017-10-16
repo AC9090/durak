@@ -11,6 +11,7 @@ import org.lwjgl.BufferUtils;
 import org.lwjgl.LWJGLException;
 import org.lwjgl.Sys;
 import org.lwjgl.input.Keyboard;
+import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.ContextAttribs;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.DisplayMode;
@@ -51,8 +52,10 @@ public class World {
 	private int pId;
 	
 	HashMap<Card, ViewCard> cards;
-
 	
+	ViewCard selected;
+	private boolean cardSel = false;
+	private boolean click = false;
 	public World(int numPlayers){
 		this.numPlayers = numPlayers;
 		game = new Game(numPlayers);
@@ -89,7 +92,38 @@ public class World {
 
 	private void getInput() {
 		
+		//terrible implementation
+		Keyboard.isKeyDown(Keyboard.KEY_RETURN);
 		
+		boolean leftButtonDown = Mouse.isButtonDown(0); // is left mouse button down.
+		boolean rightButtonDown = Mouse.isButtonDown(1); // is right mouse button down.
+		if (click){
+			if (!leftButtonDown){
+				click = false;
+			}
+		} else {
+			if (leftButtonDown) {
+				if (!cardSel) {
+					float m_x = (float) Mouse.getX() / (float) WD * 2 - 1;
+					float m_y = (float) Mouse.getY() / (float) HT * 2 - 1;
+					for (ViewCard c : cards.values()) {
+						if ((c.getX() + c.getSX() >= m_x && m_x >= c.getX())
+								&& (c.getY() + c.getSY() >= m_y && m_y >= c.getY())) {
+							c.setHighlighted(true);
+							cardSel = true;
+							selected = c;
+							System.out.println("highlighted card");
+							break;
+						}
+					}
+				} else {
+					selected.setHighlighted(false);
+					cardSel = false;
+				}
+				click = true;
+			}
+		}
+			
 	}
 
 	private void update() {
@@ -174,7 +208,7 @@ public class World {
 		cards = new HashMap<Card, ViewCard>();
 		for(Card c : game.getDeckCards()){
 			cards.put(c, new ViewCard(0,0,csx,csy,c.getSuit(), c.getValue(),tex));
-//			cards.get(c).setVisible(false);
+			cards.get(c).setVisible(false);
 		}
 		game.deal();
 		switch (numPlayers){

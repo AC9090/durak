@@ -24,7 +24,6 @@ public class ResourceLoader {
 		try {
 			InputStream in = new FileInputStream("./res/" + fileName);
 			PNGDecoder decoder = new PNGDecoder(in);
-			
 			buf = ByteBuffer.allocateDirect(
 					4 * decoder.getWidth() * decoder.getHeight());
 			decoder.decode(buf, decoder.getWidth() * 4, Format.RGBA);
@@ -46,7 +45,7 @@ public class ResourceLoader {
 		 glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 		 glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 		 glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-		 glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, tWidth, tHeight, 0, GL_RGBA, GL_BYTE, buf);
+		 glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, tWidth, tHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, buf);
 		 glGenerateMipmap(GL_TEXTURE_2D);
 		 
 		 return new Texture(texId, tWidth, tHeight);
