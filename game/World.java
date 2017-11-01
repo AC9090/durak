@@ -20,7 +20,7 @@ import org.lwjgl.opengl.PixelFormat;
 import cards.Hand;
 import cards.Suit;
 import cards.Card;
-
+import model.ViewBoard;
 import model.ViewCard;
 
 import engine.ResourceLoader;
@@ -42,8 +42,7 @@ public class World {
 	private long lastFrame;
 	private static final int WD = 800, HT = 600;
 	private static final float aspect = (float)WD / (float) HT;
-	private ViewCard viewCard;
-	private ViewCard viewCard2;
+
 	private boolean exit = false;
 	private int numPlayers;
 
@@ -51,9 +50,13 @@ public class World {
 	private int fsId;
 	private int pId;
 	
-	HashMap<Card, ViewCard> cards;
+	private float csx, csy;
 	
+	HashMap<Card, ViewCard> viewCards;
+	HashMap<ViewCard, Card> gameCards;
 	ViewCard selected;
+	private ViewBoard board;
+	
 	private boolean cardSel = false;
 	private boolean click = false;
 	public World(int numPlayers){
@@ -103,12 +106,11 @@ public class World {
 			}
 		} else {
 			if (leftButtonDown) {
+				float m_x = (float) Mouse.getX() / (float) WD * 2 - 1;
+				float m_y = (float) Mouse.getY() / (float) HT * 2 - 1;
 				if (!cardSel) {
-					float m_x = (float) Mouse.getX() / (float) WD * 2 - 1;
-					float m_y = (float) Mouse.getY() / (float) HT * 2 - 1;
-					for (ViewCard c : cards.values()) {
-						if ((c.getX() + c.getSX() >= m_x && m_x >= c.getX())
-								&& (c.getY() + c.getSY() >= m_y && m_y >= c.getY())) {
+					for (ViewCard c : viewCards.values()) { //TODO: can't select cards that are not in a hand. Get all hands then check only view cards in hands
+						if (c.isClicked(m_x, m_y)) {
 							c.setHighlighted(true);
 							cardSel = true;
 							selected = c;
@@ -117,8 +119,32 @@ public class World {
 						}
 					}
 				} else {
-					selected.setHighlighted(false);
+					int inPlaySel = -1;
+					int attDef;
+					for (int i = 0; i < 6; i++){
+						if ((board.posInPlayX()[i] + board.getCsX() >= m_x && m_x >= board.posInPlayX()[i])
+								&&   board.posInPlayY()[0] + board.getCsY() >= m_y && m_y > board.posInPlayY()[0]){
+							inPlaySel = i;
+							attDef = 0;
+							break;
+						} else	if ((board.posInPlayX()[i] + board.getCsX() >= m_x && m_x >= board.posInPlayX()[i])
+								&&   board.posInPlayY()[1] + board.getCsY() >= m_y && m_y > board.posInPlayY()[1] ){
+							inPlaySel = i;
+							attDef = 1;
+							break;
+						}
+					}
+					if (inPlaySel != -1){
+						try{
+							game.play(gameCards.get(selected), (int) inPlaySel);
+						} catch (InvalidMove e) {
+							System.out.println("You cant place this card here");
+						} catch (InvalidPlayer e) {
+							System.out.println("This player cand do this move");
+						}
+					}
 					cardSel = false;
+					selected.setHighlighted(false);
 				}
 				click = true;
 			}
@@ -129,7 +155,7 @@ public class World {
 	private void update() {
 		//top of deck
 		{
-			ViewCard c = cards.get(game.getDeckCards().get(0));
+			ViewCard c = viewCards.get(game.getDeckCards().get(0));
 			c.setPos(-1f, 1f - c.getSY());
 			c.setFaceDown();
 			c.setVisible(true);
@@ -141,14 +167,14 @@ public class World {
 			Card[] cp = ipc.get(i);
 		
 			if(cp[0] != null){
-				ViewCard c = cards.get(cp[0]);
-				c.setPos(-0.25f +  i* c.getSX(), 0 - c.getSY());
+				ViewCard c = viewCards.get(cp[0]);
+				c.setPos(board.posInPlayX()[i], board.posInPlayY()[0]);
 				c.setFaceUp();
 				c.setVisible(true);
 			}
 			if(cp[1] != null){
-				ViewCard c = cards.get(cp[1]);
-				c.setPos(-0.25f +  i* c.getSX(), 0);
+				ViewCard c = viewCards.get(cp[1]);
+				c.setPos(board.posInPlayX()[i], board.posInPlayY()[1]);
 				c.setFaceUp();
 				c.setVisible(true);
 			}
@@ -157,18 +183,19 @@ public class World {
 		// cards in hands
 		
 		ArrayList<Hand> hands = game.getHands();
-		for (int i = 0; i < hands.size(); i++){
+		for (int i = 0; i < hands.size(); i++){	//TODO: If hands.size() is bigger than viewable hands and same with viewable cards.
 			ArrayList<Card> ch = hands.get(i).getCards();
 			for(int j = 0; j < ch.size(); j++){
-				ViewCard c = cards.get(ch.get(j));
-				c.setPos(-1f + j*c.getSX(), -1f + i*c.getSY());
+				
+				ViewCard c = viewCards.get(ch.get(j));
+				c.setPos(board.posHandCardX()[j], board.posHandY()[i]);
 				c.setFaceUp();
 				c.setVisible(true);
 			}
 		}
 		
 		if (!game.getDiscard().isEmpty()){
-			ViewCard c = cards.get(game.getDiscard().getCards().get(game.getDiscard().getCards().size() - 1));
+			ViewCard c = viewCards.get(game.getDiscard().getCards().get(game.getDiscard().getCards().size() - 1));
 			c.setPos(1.0f - c.getSX(), 1.0f - c.getSY());
 			c.setFaceDown();
 			c.setVisible(true);
@@ -186,7 +213,7 @@ public class World {
 		glUseProgram(pId);
 		glColor3f(1.0f, 0.5f, 0.5f);
 	    
-		for (ViewCard c : cards.values()){
+		for (ViewCard c : viewCards.values()){
 			c.render();
 		}
 		
@@ -199,17 +226,18 @@ public class World {
 	private void initModels() {
 		Texture tex = ResourceLoader.loadTexture("cards.png", GL_TEXTURE0);
 		float cwth =  (326f/4f)/(800f/13f);
-		float csx = 0.2f;
-		float csy = csx * cwth * aspect;
+		csx = 0.17f;
+		csy = csx * cwth * aspect;
 		System.out.println(cwth);
-		viewCard = new ViewCard(-0f, -0f, csx, csy, Suit.CLUBS, 13, tex);
-		viewCard2 = new ViewCard(-0.75f, -0.75f, csx, csy, Suit.HEARTS, 8, tex);
 		//viewCard2.flip();
-		cards = new HashMap<Card, ViewCard>();
+		viewCards = new HashMap<Card, ViewCard>();
+		gameCards = new HashMap<ViewCard, Card>();
 		for(Card c : game.getDeckCards()){
-			cards.put(c, new ViewCard(0,0,csx,csy,c.getSuit(), c.getValue(),tex));
-			cards.get(c).setVisible(false);
+			viewCards.put(c, new ViewCard(0,0,csx,csy,c.getSuit(), c.getValue(),tex));
+			gameCards.put(viewCards.get(c), c);
+			viewCards.get(c).setVisible(false);
 		}
+		board = new ViewBoard(csx, csy);
 		game.deal();
 		switch (numPlayers){
 		case 2:

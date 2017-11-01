@@ -82,4 +82,9 @@ public class ViewCard extends GameObject {
 		highlighted = b;
 	}
 	
+	public boolean isClicked(float m_x, float m_y){
+		return ((x + sx >= m_x && m_x >= x) 
+				&& (y + sy >= m_y && m_y >= y));
+	}
+	
 }
