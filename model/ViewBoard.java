@@ -71,6 +71,19 @@ public class ViewBoard {
 		posY[1] = posY[0] + gap + csY;
 		return posY;
 	}
+	
+	public float posFoldX() {
+		return 1f - (2* 100f / 800f);
+	}
+	
+	public float[] posFoldY() {
+		float[] posY = new float[visiblePlayers];
+		posY[0] = -1f + gap;
+		for (int i = 1; i < visiblePlayers; i++) {
+			posY[i] = posY[i -1] + gap + csY;
+		}
+		return posY;
+	}
 
 	public float getCsX() {
 		return csX;

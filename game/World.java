@@ -21,6 +21,7 @@ import cards.Hand;
 import cards.Suit;
 import cards.Card;
 import model.CardLocator;
+import model.FoldButton;
 import model.ViewBoard;
 import model.ViewCard;
 
@@ -58,6 +59,7 @@ public class World {
 	ViewCard selected;
 	private ViewBoard board;
 	ArrayList<CardLocator> viewLocators;
+	ArrayList<FoldButton> foldButtons;
 	
 	private boolean cardSel = false;
 	private boolean click = false;
@@ -120,6 +122,19 @@ public class World {
 							break;
 						}
 					}
+					for (int i = 0 ; i < foldButtons.size(); i++) {
+						if (foldButtons.get(i).isClicked(m_x, m_y)) {
+							try {
+								game.play(game.getHands().get(i), OtherAction.FOLD);
+								break;
+							} catch (InvalidMove e) {
+								System.out.println("You cant perform this action now");
+							} catch (InvalidPlayer e) {
+								System.out.println("This player cand do this action");
+							}
+						}
+					}
+					
 				} else {
 					int inPlaySel = -1;
 					int attDef;
@@ -218,10 +233,14 @@ public class World {
 		for (CardLocator l: viewLocators) {
 			l.render();
 		}
+		for (FoldButton b : foldButtons){
+			b.render();
+		}
 		
 		for (ViewCard c : viewCards.values()){
 			c.render();
 		}
+		
 		
 //		viewCard.render();
 //		viewCard2.render();
@@ -234,7 +253,7 @@ public class World {
 		float cwth =  (326f/4f)/(800f/13f);
 		csx = 0.17f;
 		csy = csx * cwth * aspect;
-		System.out.println(cwth);
+
 		//viewCard2.flip();
 		viewCards = new HashMap<Card, ViewCard>();
 		gameCards = new HashMap<ViewCard, Card>();
@@ -249,6 +268,16 @@ public class World {
 			for (int j = 0; j < 6; j++) {
 				viewLocators.add(new CardLocator(board.posInPlayX()[j],board.posInPlayY()[i], csx, csy, tex));
 			}
+		}
+		
+		float fwth =  (50f)/(100f);
+		float fsx = 0.2f;
+		float fsy = fsx * fwth * aspect;
+		foldButtons = new ArrayList<FoldButton>();
+		for (int i = 0; i < numPlayers; i ++) {
+			foldButtons.add(new FoldButton(board.posFoldX(), board.posFoldY()[i], fsx, fsy, tex));
+			if(i >= 4 -1)
+				break;
 		}
 		
 		game.deal();

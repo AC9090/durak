@@ -20,8 +20,10 @@ public class InPlay extends CardGroup {
 		ArrayList<Card> c = new ArrayList<Card>();
 		Iterator<Card[]> bat = battles.iterator();
 		while (bat.hasNext()){
-			c.add(bat.next()[0]);
-			c.add(bat.next()[1]);
+			Card[] b = bat.next();
+			c.add(b[0]);
+			if (!(b[1] == null))
+				c.add(b[1]);
 		}
 		battles.clear();
 		return c;

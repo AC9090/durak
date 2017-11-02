@@ -79,7 +79,7 @@ public class Game {
 			break;
 			
 		case INIT_DEF:
-			if (!h.equals(defender)){
+			if (!h.equals(defender)){ //TODO: this isn't right. Other players can trhow in cards if not defender.
 				throw new InvalidPlayer();
 			}
 			if (initAttC.getValue() == c.getValue()) {
@@ -114,14 +114,24 @@ public class Game {
 			switch (playState){
 			case INIT_ATT:
 				throw new InvalidMove();
-			
+				
+			case INIT_DEF:
+				if(!h.equals(defender)) 
+					throw new InvalidMove();
+				h.add(inPlay.fold());
+				pickUp(h);
+				nextDefender();
+				if(playersHuman.size() - notDurak.size() > 2) // TODO: Check this rule is correct.
+					nextDefender();
+				playState = PlayState.INIT_ATT;
+				
 			case MAIN:
 				if(!h.equals(defender)){
 					if (!folded.contains(h))
 						folded.add(h);
 				} else {
 					h.add(inPlay.fold());
-					pickUp(playersHuman.get(playersHuman.indexOf(defender) + 1));
+					pickUp(h);
 					nextDefender();
 					if(playersHuman.size() - notDurak.size() > 2) // TODO: Check this rule is correct.
 						nextDefender();

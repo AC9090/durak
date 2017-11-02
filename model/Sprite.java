@@ -66,7 +66,7 @@ public class Sprite {
 	private float[] genVertexArray(){
 		float f_x = ((float) x) / ((float) tex.getSIZEX());
 		float f_y = ((float) y) / ((float) tex.getSIZEY());
-		float f_sx = ((float) SIZEX) / ((float) tex.getSIZEY());
+		float f_sx = ((float) SIZEX) / ((float) tex.getSIZEX());
 		float f_sy = ((float) SIZEY) / ((float) tex.getSIZEY());
 		return new float[] {
 				f_x, f_y + f_sy,
