@@ -20,6 +20,7 @@ import org.lwjgl.opengl.PixelFormat;
 import cards.Hand;
 import cards.Suit;
 import cards.Card;
+import model.CardLocator;
 import model.ViewBoard;
 import model.ViewCard;
 
@@ -56,6 +57,7 @@ public class World {
 	HashMap<ViewCard, Card> gameCards;
 	ViewCard selected;
 	private ViewBoard board;
+	ArrayList<CardLocator> viewLocators;
 	
 	private boolean cardSel = false;
 	private boolean click = false;
@@ -213,6 +215,10 @@ public class World {
 		glUseProgram(pId);
 		glColor3f(1.0f, 0.5f, 0.5f);
 	    
+		for (CardLocator l: viewLocators) {
+			l.render();
+		}
+		
 		for (ViewCard c : viewCards.values()){
 			c.render();
 		}
@@ -238,7 +244,15 @@ public class World {
 			viewCards.get(c).setVisible(false);
 		}
 		board = new ViewBoard(csx, csy);
+		viewLocators = new ArrayList<CardLocator>();
+		for (int i = 0; i<2; i++) {
+			for (int j = 0; j < 6; j++) {
+				viewLocators.add(new CardLocator(board.posInPlayX()[j],board.posInPlayY()[i], csx, csy, tex));
+			}
+		}
+		
 		game.deal();
+		
 		switch (numPlayers){
 		case 2:
 			

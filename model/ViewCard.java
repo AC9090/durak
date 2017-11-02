@@ -24,9 +24,9 @@ public class ViewCard extends GameObject {
 		this.value = value;
 		
 		highlighted = false;
+		faceDown = false;
 		
 		this.vaoId = glGenVertexArrays();
-		faceDown = false;
 		glBindVertexArray(vaoId);
 		vboIdVert = glGenBuffers();
 		vboIdInd = glGenBuffers();

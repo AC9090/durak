@@ -26,18 +26,21 @@ public class InPlay extends CardGroup {
 		battles.clear();
 		return c;
 	}
-	
 	public void attack(Card c) throws InvalidMove{ //places a card in the attack column checking it is allowed
 		boolean valid = false;
 		
 		Iterator<Card[]> cards = battles.iterator();
 		while(cards.hasNext()){
 			Card c_[] =cards.next();
-			if (c_[0].getValue() == c.getValue() 
-					|| c_[1].getValue() == c.getValue()){
+			if (c_[0].getValue() == c.getValue())
 				valid = true;
-				break;
+			if (!(c_[1] == null)) {
+				if (c_[1].getValue() == c.getValue()){
+					valid = true;
+				}	
 			}
+			if (valid == true)
+				break;
 		}
 		if (battles.size() == 0)
 			valid = true;
@@ -51,6 +54,14 @@ public class InPlay extends CardGroup {
 	}
 	
 	public void defend(Card c, int index) throws InvalidMove{
+		System.out.println(battles.size());
+		if (battles.size() < index + 1)
+			throw new InvalidMove();
+		if (battles.get(index)[0] == null)
+			throw new InvalidMove();
+		if (isDefended(index)) {
+			throw new InvalidMove();
+		}
 		
 		if ((battles.get(index)[0].getSuit().equals(c.getSuit()) && battles.get(index)[0].getValue() < c.getValue())
 				||( ! battles.get(index)[0].getSuit().equals(trump)) && c.getSuit().equals(trump)){

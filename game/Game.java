@@ -26,8 +26,11 @@ public class Game {
 	}
 	private PlayState playState;
 	
+	private Card initAttC;
+	
 	private Hand defender;
 	private Hand attacker;
+	
 	
 	private boolean gameOver;
 	
@@ -38,10 +41,12 @@ public class Game {
 		deck = new Deck();
 		deck.buildDeck();
 		trump = deck.pickTrump();
+		System.out.println("Trump" + trump);
 		inPlay = new InPlay(trump);
 		discard = new Discard();
 		
 		playState = PlayState.INIT_ATT;
+		
 		for(int i = 0; i <  numPlayersHuman; i++){
 			playersHuman.add(new Hand());
 		}
@@ -67,10 +72,27 @@ public class Game {
 			if (!h.equals(attacker)){
 				throw new InvalidPlayer();
 			}
+			initAttC = c;
 			inPlay.attack(c);
 			h.remove(c);
+			playState = PlayState.INIT_DEF;
+			break;
+			
+		case INIT_DEF:
+			if (!h.equals(defender)){
+				throw new InvalidPlayer();
+			}
+			if (initAttC.getValue() == c.getValue()) {
+				inPlay.attack(c);
+				h.remove(c);
+				nextDefender();
+			} else {
+				inPlay.defend(c, selection);
+				h.remove(c);
+			}
 			playState = PlayState.MAIN;
 			break;
+			
 		case MAIN:
 			if(!h.equals(defender)){
 				inPlay.attack(c);
@@ -152,13 +174,20 @@ public class Game {
 	}
 
 	private void nextDefender(){
-		Iterator<Hand> playersIt = playersHuman.listIterator(playersHuman.indexOf(defender) + 1);
-		Hand h = playersIt.next();
-		while (playersIt.hasNext()) {
-			if(!notDurak.contains(h)){
-				defender = h;
-		}else
-				h = playersIt.next();
+		int i = playersHuman.indexOf(defender) + 1;
+		
+		while (true) {
+			if (i == playersHuman.indexOf(defender))
+				break; //TODO: is this check handled properly
+			
+			if (i == playersHuman.size())
+				i = 0;
+			if(!notDurak.contains(playersHuman.get(i))){
+				defender = playersHuman.get(i);
+				System.out.println("new defender!");
+				break;
+			}
+			i ++;
 		}
 		
 		int attNum = (playersHuman.indexOf(defender) - 1) % (playersHuman.size());
