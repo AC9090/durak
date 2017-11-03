@@ -250,4 +250,8 @@ public class Game {
 		return discard;
 	}
 
+	public Hand getDefender() {
+		return defender;
+	}
+
 }

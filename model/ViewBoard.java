@@ -5,7 +5,7 @@ package model;
  * Gaps between cards need to be defined as well as positiions of all elements on the board.
  * There may be a more staic way to implement this class.
  * Vectors would make this easire but would require a full refactor.
- * 
+ *  All sizes should be defined here!
  */
 public class ViewBoard {
 
@@ -13,7 +13,7 @@ public class ViewBoard {
 	private float csX, csY;
 	
 	private final int visiblePlayers = 4;
-	private final int visibleHandCards = 8;
+	private final int visibleHandCards = 7;
 	private final float gap = 0.02f;
 	
 	public ViewBoard (float csX, float csY) {
@@ -40,7 +40,7 @@ public class ViewBoard {
 	
 	public float[] posHandCardX() {
 		float[] posX = new float[visibleHandCards];
-		posX[0] = -1f;
+		posX[0] = -1f + csX;
 		for (int i = 1; i < posX.length; i++) {
 			posX[i] = posX[i -1] + gap + csX;
 		}
@@ -84,6 +84,38 @@ public class ViewBoard {
 		}
 		return posY;
 	}
+	
+	public float posDefenderTokenX() {
+		return posFoldX() + (2* 50f / 800f);
+	}
+	
+	public float[] posDefenderTokenY() {
+		return posPlayerMarkY();
+	}
+	
+	public float posPlayerMarkX() {
+		return posFoldX();
+	}
+	
+	public float[] posPlayerMarkY() {
+		float[] posY = new float[visiblePlayers];
+		posY[0] = -1f + csX;
+		for (int i = 1; i < visiblePlayers; i++) {
+			posY[i] = posY[i -1] + gap + csY;
+		}
+		return posY;
+	}
+
+	public float posLeftArrowX() {
+		return -1f + gap;
+	}
+	public float posRightArrowX() {
+		return posFoldX() - csX - gap;
+	}
+	
+	public float[] posLRArrowY() {
+		return posHandY();
+	}
 
 	public float getCsX() {
 		return csX;
@@ -92,4 +124,13 @@ public class ViewBoard {
 	public float getCsY() {
 		return csY;
 	}
+	
+	public int getVisiblePlayers() {
+		return visiblePlayers;
+	}
+	
+	public int getVisibleHandCards() {
+		return visibleHandCards;
+	}
+	
 }

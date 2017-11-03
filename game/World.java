@@ -21,7 +21,10 @@ import cards.Hand;
 import cards.Suit;
 import cards.Card;
 import model.CardLocator;
+import model.DefenderMarker;
 import model.FoldButton;
+import model.LRArrow;
+import model.PlayerMarker;
 import model.ViewBoard;
 import model.ViewCard;
 
@@ -59,12 +62,20 @@ public class World {
 	ViewCard selected;
 	private ViewBoard board;
 	ArrayList<CardLocator> viewLocators;
+	
 	ArrayList<FoldButton> foldButtons;
+	ArrayList<LRArrow> lArrows;
+	ArrayList<LRArrow> rArrows;
+	
+	ArrayList<PlayerMarker> playerMarks;
+	DefenderMarker defMark;
+	int[] handFirstCard;
 	
 	private boolean cardSel = false;
 	private boolean click = false;
 	public World(int numPlayers){
 		this.numPlayers = numPlayers;
+		handFirstCard = new int[numPlayers];
 		game = new Game(numPlayers);
 		initDisplay();
 		initGl();
@@ -112,7 +123,7 @@ public class World {
 			if (leftButtonDown) {
 				float m_x = (float) Mouse.getX() / (float) WD * 2 - 1;
 				float m_y = (float) Mouse.getY() / (float) HT * 2 - 1;
-				if (!cardSel) {
+				if (!cardSel) { //TODO: Possible to select 2 things at once?
 					for (ViewCard c : viewCards.values()) { //TODO: can't select cards that are not in a hand. Get all hands then check only view cards in hands
 						if (c.isClicked(m_x, m_y)) {
 							c.setHighlighted(true);
@@ -132,6 +143,19 @@ public class World {
 							} catch (InvalidPlayer e) {
 								System.out.println("This player cand do this action");
 							}
+						}
+					}
+					
+					for (int i = 0; i < board.getVisiblePlayers() && i < numPlayers; i++) {
+						if(lArrows.get(i).isClicked(m_x, m_y)) {
+							if (handFirstCard[i] >= 1)
+								handFirstCard[i] -= 1;
+							break;
+						}
+						if(rArrows.get(i).isClicked(m_x, m_y)) {
+							if (handFirstCard[i] < game.getHands().get(i).getCards().size() - 1)
+								handFirstCard[i] += 1;
+							break;
 						}
 					}
 					
@@ -205,9 +229,16 @@ public class World {
 			for(int j = 0; j < ch.size(); j++){
 				
 				ViewCard c = viewCards.get(ch.get(j));
-				c.setPos(board.posHandCardX()[j], board.posHandY()[i]);
-				c.setFaceUp();
-				c.setVisible(true);
+				if (j >= handFirstCard[i]) {
+					c.setPos(board.posHandCardX()[j - handFirstCard[i]], board.posHandY()[i]);
+					c.setFaceUp();
+					c.setVisible(true);
+				} else {
+					c.setPos(0, 0);
+					c.setVisible(false);
+				}
+				if(j >= board.getVisibleHandCards())
+					break;
 			}
 		}
 		
@@ -217,6 +248,7 @@ public class World {
 			c.setFaceDown();
 			c.setVisible(true);
 		}
+		defMark.setPos(board.posDefenderTokenX(), board.posDefenderTokenY()[game.getHands().indexOf(game.getDefender())]);
 			
 				
 	}
@@ -236,10 +268,22 @@ public class World {
 		for (FoldButton b : foldButtons){
 			b.render();
 		}
+		for (LRArrow a : lArrows){
+			a.render();
+		}
+		for (LRArrow a : rArrows){
+			a.render();
+		}
+		for (PlayerMarker p : playerMarks){
+			p.render();
+		}
+
+		defMark.render();
 		
 		for (ViewCard c : viewCards.values()){
 			c.render();
 		}
+		
 		
 		
 //		viewCard.render();
@@ -270,15 +314,32 @@ public class World {
 			}
 		}
 		
-		float fwth =  (50f)/(100f);
+		float fwth =  (50f)/(100f); // for fold buttons
 		float fsx = 0.2f;
 		float fsy = fsx * fwth * aspect;
+		
+		float awth =  (50f)/(20f); // for lr arrows
+		float asx = 0.08f;
+		float asy = asx * awth * aspect;
+		
+		float tsx = 0.08f; //token size
+		float tsy = tsx * aspect;
+		
 		foldButtons = new ArrayList<FoldButton>();
+		lArrows = new ArrayList<LRArrow>();
+		rArrows = new ArrayList<LRArrow>();
+		playerMarks = new ArrayList<PlayerMarker>();
 		for (int i = 0; i < numPlayers; i ++) {
 			foldButtons.add(new FoldButton(board.posFoldX(), board.posFoldY()[i], fsx, fsy, tex));
+			lArrows.add(new LRArrow(board.posLeftArrowX(), board.posLRArrowY()[i], asx, asy, true, tex));
+			rArrows.add(new LRArrow(board.posRightArrowX(), board.posLRArrowY()[i], asx, asy, false, tex));
+			playerMarks.add(new PlayerMarker(board.posPlayerMarkX(), board.posPlayerMarkY()[i], tsx, tsy, i, tex));
+			if (i > board.getVisiblePlayers() -1)
+				playerMarks.get(i).setVisible(false);
 			if(i >= 4 -1)
 				break;
 		}
+		defMark = new DefenderMarker(board.posDefenderTokenX(), board.posDefenderTokenY()[game.getHands().indexOf(game.getDefender())], tsx, tsy, tex);
 		
 		game.deal();
 		
