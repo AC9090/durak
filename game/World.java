@@ -250,7 +250,7 @@ public class World {
 		}
 		defMark.setPos(board.posDefenderTokenX(), board.posDefenderTokenY()[game.getHands().indexOf(game.getDefender())]);
 			
-				
+		
 	}
 	
 
@@ -279,6 +279,8 @@ public class World {
 		}
 
 		defMark.render();
+		
+		//viewCards.get(game.getDeckTrump()).render();
 		
 		for (ViewCard c : viewCards.values()){
 			c.render();

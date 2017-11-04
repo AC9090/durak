@@ -6,6 +6,8 @@ import java.util.Collections;
 
 public class Deck extends CardGroup {
 	
+	private Card trump;
+	
 	public Deck(ArrayList<Card> cards) {
 		super(cards);
 
@@ -19,6 +21,7 @@ public class Deck extends CardGroup {
 		Card c = cards.remove(0);
 		Suit s = c.getSuit();
 		cards.add(c);
+		trump = c;
 		return s;
 	}
 	
@@ -48,5 +51,9 @@ public class Deck extends CardGroup {
 		if (!cards.isEmpty())
 			return cards.remove(0);
 		return null;
+	}
+
+	public Card getTrump() {
+		return trump;
 	}
 }

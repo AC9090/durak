@@ -239,6 +239,10 @@ public class Game {
 		return deck.getCards();
 	}
 	
+	public Card getDeckTrump() {
+		return deck.getTrump();
+	}
+	
 	public ArrayList<Card[]> getInPlayCards(){
 		return inPlay.getCardPairs();
 	}
