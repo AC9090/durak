@@ -34,7 +34,7 @@ public class Deck extends CardGroup {
 	}
 	
 	public ArrayList<Card> buildDeck(){ //TODO:choose whether deck starts at 6. also fix value of ace.
-		for(int i = 1; i <= 12; i++){
+		for(int i = 5; i <= 13; i++){
 			for(Suit s : Suit.values()){
 				cards.add(new Card(i, s));
 			}

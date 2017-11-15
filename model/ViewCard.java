@@ -32,7 +32,9 @@ public class ViewCard extends GameObject {
 		vboIdInd = glGenBuffers();
 		glBindVertexArray(0);
 		
-		faceSpr = new Sprite(800/13 * (value - 1), 326/4 * suit.value(), 800/13, 326/4, tex, vaoId);
+		int faceValue = (value) % 13;  // Ace is high
+		
+		faceSpr = new Sprite(800/13 * faceValue, 326/4 * suit.value(), 800/13, 326/4, tex, vaoId);
 		backSpr = new Sprite(0, 326/4 * 4, 800/13, 326/4, tex, vaoId);
 		this.spr = faceSpr;
 	}

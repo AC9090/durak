@@ -243,9 +243,13 @@ public class World {
 		}
 		
 		if (!game.getDiscard().isEmpty()){
+			for (Card c: game.getDiscard().getCards()) { 
+				ViewCard vc = viewCards.get(c);
+				vc.setPos(board.posDiscX(), board.posDiscY());
+				vc.setFaceDown();
+				vc.setVisible(false);
+			}
 			ViewCard c = viewCards.get(game.getDiscard().getCards().get(game.getDiscard().getCards().size() - 1));
-			c.setPos(1.0f - c.getSX(), 1.0f - c.getSY());
-			c.setFaceDown();
 			c.setVisible(true);
 		}
 		defMark.setPos(board.posDefenderTokenX(), board.posDefenderTokenY()[game.getHands().indexOf(game.getDefender())]);

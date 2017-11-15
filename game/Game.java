@@ -129,6 +129,7 @@ public class Game {
 				if(!h.equals(defender)){
 					if (!folded.contains(h))
 						folded.add(h);
+					
 				} else {
 					h.add(inPlay.fold());
 					pickUp(h);
@@ -167,7 +168,8 @@ public class Game {
 			nextDefender();
 			folded.clear();
 			
-			playState = PlayState.MAIN;
+			playState = PlayState.INIT_ATT;
+
 		}
 		
 	}
@@ -233,6 +235,10 @@ public class Game {
 			}
 		}
 		return nd;
+	}
+	
+	public boolean hasFolded(Hand h) {
+		return (folded.contains(h))? true : false;
 	}
 
 	public ArrayList<Card> getDeckCards() {

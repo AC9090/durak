@@ -34,7 +34,7 @@ public class ViewBoard {
 		return 1f - csX;
 	}
 	
-	public float posDicsY() {
+	public float posDiscY() {
 		return 1f - csY;
 	}
 	
